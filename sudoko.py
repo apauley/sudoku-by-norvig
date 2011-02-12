@@ -77,6 +77,16 @@ def eliminate(values, square, digit):
                 return False
     return values
 
+def display(values):
+    "Display these values as a 2-D grid."
+    width = 1+max(len(values[s]) for s in squares)
+    line = '+'.join(['-'*(width*3)]*3)
+    for r in rows:
+        print ''.join(values[r+c].center(width)+('|' if c in '36' else '')
+                      for c in cols)
+        if r in 'CF': print line
+    print
+
 if __name__ == '__main__':
     grid = file('top95.txt').readlines()[0]
-    print parse_grid(grid)
+    display(parse_grid(grid))
