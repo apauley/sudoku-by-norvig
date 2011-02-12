@@ -77,6 +77,27 @@ def eliminate(values, square, digit):
                 return False
     return values
 
+def solve(grid):
+    return search(parse_grid(grid))
+
+def search(values):
+    "Using depth-first search and propagation, try all possible values."
+    if values is False:
+        return False ## Failed earlier
+    if all(len(values[s]) == 1 for s in squares):
+        return values ## Solved!
+    ## Choose the unfilled square s with the fewest possibilities
+    possibilities, square = min((len(values[s]), s)
+                                for s in squares if len(values[s]) > 1)
+    return some(search(assign(values.copy(), square, digit))
+                for digit in values[square])
+
+def some(seq):
+    "Return some element of seq that is true."
+    for e in seq:
+        if e: return e
+    return False
+
 def display(values):
     "Display these values as a 2-D grid."
     width = 1+max(len(values[s]) for s in squares)
@@ -89,4 +110,4 @@ def display(values):
 
 if __name__ == '__main__':
     grid = file('top95.txt').readlines()[0]
-    display(parse_grid(grid))
+    display(solve(grid))
