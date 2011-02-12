@@ -3,6 +3,8 @@
 # A sudoku solver by Peter Norvig
 # http://norvig.com/sudoku.html
 
+import time
+
 def cross(A, B):
     return [a+b for a in A for b in B]
 
@@ -98,6 +100,31 @@ def some(seq):
         if e: return e
     return False
 
+def solve_all(grids, name='', showif=0.0):
+    """Attempt to solve a sequence of grids. Report results.
+    When showif is a number of seconds, display puzzles that take longer.
+    When showif is None, don't display any puzzles."""
+    def time_solve(grid):
+        start = time.clock()
+        values = solve(grid)
+        t = time.clock()-start
+        ## Display puzzles that take long enough
+        if showif is not None and t > showif:
+            display(grid_values(grid))
+            if values: display(values)
+            print '(%.2f seconds)\n' % t
+        return (t, solved(values))
+    times, results = zip(*[time_solve(grid) for grid in grids])
+    N = len(grids)
+    if N > 1:
+        print "Solved %d of %d %s puzzles (avg %.2f secs (%d Hz), max %.2f secs)." % (
+            sum(results), N, name, sum(times)/N, N/sum(times), max(times))
+
+def solved(values):
+    "A puzzle is solved if each unit is a permutation of the digits 1 to 9."
+    def unitsolved(unit): return set(values[s] for s in unit) == set(digits)
+    return values is not False and all(unitsolved(unit) for unit in unitlist)
+
 def display(values):
     "Display these values as a 2-D grid."
     width = 1+max(len(values[s]) for s in squares)
@@ -108,6 +135,11 @@ def display(values):
         if r in 'CF': print line
     print
 
+def from_file(filename, sep='\n'):
+    "Parse a file into a list of strings, separated by sep."
+    return file(filename).read().strip().split(sep)
+
 if __name__ == '__main__':
-    grid = file('top95.txt').readlines()[0]
-    display(solve(grid))
+    solve_all(from_file("easy50.txt", '========'), "easy", None)
+    solve_all(from_file("top95.txt"), "hard", None)
+    solve_all(from_file("hardest.txt"), "hardest", None)
