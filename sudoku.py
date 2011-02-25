@@ -3,7 +3,7 @@
 # A sudoku solver by Peter Norvig
 # http://norvig.com/sudoku.html
 
-import time
+import os, time
 
 def cross(A, B):
     return [a+b for a in A for b in B]
@@ -146,8 +146,18 @@ def from_file(filename, sep='\n'):
     "Parse a file into a list of strings, separated by sep."
     return file(filename).read().strip().split(sep)
 
+def to_file(outfile, solutions):
+    grids = [to_string(s)+'\n' for s in solutions]
+    fp = file(outfile, 'w')
+    try:
+        fp.writelines(grids)
+    finally:
+        fp.close()
+
 def solve_file(filename, sep='\n'):
-    return solve_all(from_file(filename, sep), filename, None)
+    solutions = solve_all(from_file(filename, sep), filename, None)
+    outfile = os.path.splitext(filename)[0] + '.out'
+    to_file(outfile, solutions)
 
 if __name__ == '__main__':
     solve_file("easy50.txt", '========')
