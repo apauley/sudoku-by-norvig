@@ -113,8 +113,8 @@ def solve_all(grids, name='', showif=0.0):
             display(grid_values(grid))
             if values: display(values)
             print '(%.2f seconds)\n' % t
-        return (t, solved(values))
-    times, results = zip(*[time_solve(grid) for grid in grids])
+        return (t, solved(values), values)
+    times, results, valuedicts = zip(*[time_solve(grid) for grid in grids])
     N = len(grids)
     if N > 1:
         print "Solved %d of %d %s puzzles (avg %.2f secs (%d Hz), max %.2f secs)." % (
@@ -124,6 +124,12 @@ def solved(values):
     "A puzzle is solved if each unit is a permutation of the digits 1 to 9."
     def unitsolved(unit): return set(values[s] for s in unit) == set(digits)
     return values is not False and all(unitsolved(unit) for unit in unitlist)
+
+def to_string(values):
+    return ''.join([value_or_dot(values[s]) for s in squares])
+
+def value_or_dot(value):
+    return (value if (len(value) == 1) else '.')
 
 def display(values):
     "Display these values as a 2-D grid."
