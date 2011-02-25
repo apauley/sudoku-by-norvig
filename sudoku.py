@@ -117,8 +117,9 @@ def solve_all(grids, name='', showif=0.0):
     times, results, valuedicts = zip(*[time_solve(grid) for grid in grids])
     N = len(grids)
     if N > 1:
-        print "Solved %d of %d %s puzzles (avg %.2f secs (%d Hz), max %.2f secs)." % (
+        print "Solved %d of %d puzzles from %s (avg %.2f secs (%d Hz), max %.2f secs)." % (
             sum(results), N, name, sum(times)/N, N/sum(times), max(times))
+    return valuedicts
 
 def solved(values):
     "A puzzle is solved if each unit is a permutation of the digits 1 to 9."
@@ -145,7 +146,10 @@ def from_file(filename, sep='\n'):
     "Parse a file into a list of strings, separated by sep."
     return file(filename).read().strip().split(sep)
 
+def solve_file(filename, sep='\n'):
+    return solve_all(from_file(filename, sep), filename, None)
+
 if __name__ == '__main__':
-    solve_all(from_file("easy50.txt", '========'), "easy", None)
-    solve_all(from_file("top95.txt"), "hard", None)
-    solve_all(from_file("hardest.txt"), "hardest", None)
+    solve_file("easy50.txt", '========')
+    solve_file("top95.txt")
+    solve_file("hardest.txt")
