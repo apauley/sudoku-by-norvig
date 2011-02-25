@@ -117,8 +117,9 @@ def solve_all(grids, name='', showif=0.0):
     times, results, valuedicts = zip(*[time_solve(grid) for grid in grids])
     N = len(grids)
     if N > 1:
-        print "Solved %d of %d puzzles from %s (avg %.6f secs (%d Hz), max %.6f secs)." % (
-            sum(results), N, name, sum(times)/N, N/sum(times), max(times))
+        print """Solved %d of %d puzzles from %s
+\t(avg %.6f secs (%d Hz), max %.6f secs, min %.6f secs).""" % (
+            sum(results), N, name, sum(times)/N, N/sum(times), max(times), min(times))
     return valuedicts
 
 def solved(values):
