@@ -64,11 +64,9 @@ def eliminate(values, square, digit):
     if len(values[square]) == 0:
         return False ## Contradiction: removed last value
 
-    ## (1) If a square is reduced to one value d2, then eliminate d2 from the peers.
-    if len(values[square]) == 1:
-        d2 = values[square]
-        if not all(eliminate(values, s2, d2) for s2 in peers[square]):
-            return False
+    values = peer_eliminate(values, square)
+    if values is False:
+        return False
     ## (2) If a unit is reduced to only one place for a digit, then put it there
     for u in units[square]:
         digit_places = [square2 for square2 in u if digit in values[square2]]
@@ -78,6 +76,14 @@ def eliminate(values, square, digit):
             # d can only be in one place in unit; assign it there
             if not assign(values, digit_places[0], digit):
                 return False
+    return values
+
+def peer_eliminate(values, square):
+    ## (1) If a square is reduced to one value, then eliminate it from the peers.
+    if len(values[square]) == 1:
+        digit = values[square]
+        if not all(eliminate(values, s2, digit) for s2 in peers[square]):
+            return False
     return values
 
 def solve(grid):
