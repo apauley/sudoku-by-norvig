@@ -61,10 +61,11 @@ def eliminate(values, square, digit):
     if digit not in values[square]:
         return values ## Already eliminated
     values[square] = values[square].replace(digit, '')
-    ## (1) If a square is reduced to one value d2, then eliminate d2 from the peers.
     if len(values[square]) == 0:
         return False ## Contradiction: removed last value
-    elif len(values[square]) == 1:
+
+    ## (1) If a square is reduced to one value d2, then eliminate d2 from the peers.
+    if len(values[square]) == 1:
         d2 = values[square]
         if not all(eliminate(values, s2, d2) for s2 in peers[square]):
             return False
