@@ -3,7 +3,7 @@
 # A sudoku solver by Peter Norvig
 # http://norvig.com/sudoku.html
 
-import os, time
+import sys, os, time
 
 def cross(A, B):
     return [a+b for a in A for b in B]
@@ -189,8 +189,9 @@ def test():
                                'A1', 'A3', 'B1', 'B3'])
     print 'All tests pass.'
 
+def solve_files(*filenames):
+    [solve_file(filename) for filename in filenames]
+
 if __name__ == '__main__':
     test()
-    solve_file("easy50.txt", '========')
-    solve_file("top95.txt")
-    solve_file("hardest.txt")
+    solve_files("easy50.txt", "top95.txt", "hardest.txt")
