@@ -194,4 +194,7 @@ def solve_files(*filenames):
 
 if __name__ == '__main__':
     test()
-    solve_files("easy50.txt", "top95.txt", "hardest.txt")
+    if len(sys.argv) > 1:
+        solve_files(*sys.argv[1:])
+    else:
+        solve_files("easy50.txt", "top95.txt", "hardest.txt")
