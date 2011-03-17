@@ -28,11 +28,19 @@ units = dict((s, [u for u in unitlist if s in u])
 peers = dict((s, set(s2 for u in units[s] for s2 in u if s2 != s))
              for s in squares)
 
+class Puzzle(dict):
+    def __init__(self, tuples, count=0):
+        self.count = count
+        super(Puzzle, self).__init__(tuples)
+
+    def copy(self):
+        return Puzzle(self.items(), self.count)
+
 def parse_grid(grid):
     """Convert grid to a dict of possible values, {square: digits}, or
     return False if a contradiction is detected."""
     ## To start, every square can be any digit; then assign values from the grid.
-    values = dict((square, digits) for square in squares)
+    values = Puzzle((square, digits) for square in squares)
     for square, digit in grid_values(grid).items():
         if digit in digits and not assign(values, square, digit):
             return False ## (Fail if we can't assign d to square s.)
@@ -42,7 +50,7 @@ def grid_values(grid):
     "Convert grid into a dict of {square: char} with '0' or '.' for empties."
     chars = [c for c in grid if c in digits or c in '0.']
     assert len(chars) == 81
-    return dict(zip(squares, chars))
+    return Puzzle(zip(squares, chars))
 
 def assign(values, square, digit):
     """Eliminate all the other values (except digit) from values[square]
