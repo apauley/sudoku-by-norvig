@@ -37,16 +37,20 @@ class Puzzle(dict):
         return Puzzle(self.items(), self.count)
 
 def has_failed(puzzle):
-    return puzzle is False
+    return not puzzle
+
+def failed(puzzle):
+    "Return a failed puzzle"
+    return Puzzle([], puzzle.count)
 
 def parse_grid(grid):
     """Convert grid to a dict of possible values, {square: digits}, or
-    return False if a contradiction is detected."""
+    return a failed puzzle if a contradiction is detected."""
     ## To start, every square can be any digit; then assign values from the grid.
     values = Puzzle((square, digits) for square in squares)
     for square, digit in grid_values(grid).items():
         if digit in digits and not assign(values, square, digit):
-            return False ## (Fail if we can't assign d to square s.)
+            return failed(values) ## (Fail if we can't assign d to square s.)
     return values
 
 def grid_values(grid):
@@ -58,30 +62,30 @@ def grid_values(grid):
 def assign(values, square, digit):
     """Eliminate all the other values (except digit) from values[square]
     and propagate.
-    Return values, except return False if a contradiction is detected."""
+    Return values, except return failed if a contradiction is detected."""
     other_values = values[square].replace(digit, '')
     if all(eliminate(values, square, digit2) for digit2 in other_values):
         return values
     else:
-        return False
+        return failed(values)
 
 def eliminate(values, square, digit):
     """Eliminate digit from values[square];
     propagate when values or places <= 2.
-    Return values, except return False if a contradiction is detected."""
+    Return values, except return failed if a contradiction is detected."""
     if digit not in values[square]:
         return values ## Already eliminated
     values[square] = values[square].replace(digit, '')
     if len(values[square]) == 0:
-        return False ## Contradiction: removed last value
+        return failed(values) ## Contradiction: removed last value
 
     values = peer_eliminate(values, square)
     if has_failed(values):
-        return False
+        return failed(values)
 
     values = assign_unique_place(values, square, digit)
     if has_failed(values):
-        return False
+        return failed(values)
 
     return values
 
@@ -90,7 +94,7 @@ def peer_eliminate(values, square):
     if len(values[square]) == 1:
         digit = values[square]
         if not all(eliminate(values, s2, digit) for s2 in peers[square]):
-            return False
+            return failed(values)
     return values
 
 def assign_unique_place(values, square, digit):
@@ -98,11 +102,11 @@ def assign_unique_place(values, square, digit):
     for u in units[square]:
         digit_places = [square2 for square2 in u if digit in values[square2]]
         if len(digit_places) == 0:
-            return False ## Contradiction: no place for this value
+            return failed(values) ## Contradiction: no place for this value
         elif len(digit_places) == 1:
             # digit can only be in one place in unit; assign it there
             if not assign(values, digit_places[0], digit):
-                return False
+                return failed(values)
     return values
 
 def solve(grid):
@@ -111,7 +115,7 @@ def solve(grid):
 def search(values):
     "Using depth-first search and propagation, try all possible values."
     if has_failed(values):
-        return False ## Failed earlier
+        return failed(values) ## Failed earlier
     if all(len(values[s]) == 1 for s in squares):
         return values ## Solved!
     ## Choose the unfilled square s with the fewest possibilities
@@ -124,7 +128,7 @@ def some(seq):
     "Return some element of seq that is true."
     for e in seq:
         if e: return e
-    return False
+    return failed(e)
 
 def solve_all(grids, name='', showif=0.0):
     """Attempt to solve a sequence of grids. Report results.
