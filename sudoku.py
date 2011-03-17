@@ -36,6 +36,9 @@ class Puzzle(dict):
     def copy(self):
         return Puzzle(self.items(), self.count)
 
+def has_failed(puzzle):
+    return puzzle is False
+
 def parse_grid(grid):
     """Convert grid to a dict of possible values, {square: digits}, or
     return False if a contradiction is detected."""
@@ -73,11 +76,11 @@ def eliminate(values, square, digit):
         return False ## Contradiction: removed last value
 
     values = peer_eliminate(values, square)
-    if values is False:
+    if has_failed(values):
         return False
 
     values = assign_unique_place(values, square, digit)
-    if values is False:
+    if has_failed(values):
         return False
 
     return values
@@ -107,7 +110,7 @@ def solve(grid):
 
 def search(values):
     "Using depth-first search and propagation, try all possible values."
-    if values is False:
+    if has_failed(values):
         return False ## Failed earlier
     if all(len(values[s]) == 1 for s in squares):
         return values ## Solved!
@@ -148,7 +151,7 @@ def solve_all(grids, name='', showif=0.0):
 def solved(values):
     "A puzzle is solved if each unit is a permutation of the digits 1 to 9."
     def unitsolved(unit): return set(values[s] for s in unit) == set(digits)
-    return values is not False and all(unitsolved(unit) for unit in unitlist)
+    return (not has_failed(values)) and all(unitsolved(unit) for unit in unitlist)
 
 def to_string(values):
     return ''.join([value_or_dot(values[s]) for s in squares])
