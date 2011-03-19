@@ -47,11 +47,11 @@ def parse_grid(grid):
     """Convert grid to a dict of possible values, {square: digits}, or
     return a failed puzzle if a contradiction is detected."""
     ## To start, every square can be any digit; then assign values from the grid.
-    values = Puzzle((square, digits) for square in squares)
+    puzzle = Puzzle((square, digits) for square in squares)
     for square, digit in grid_values(grid).items():
-        if digit in digits and not assign(values, square, digit):
-            return failed(values) ## (Fail if we can't assign d to square s.)
-    return values
+        if digit in digits and not assign(puzzle, square, digit):
+            return failed(puzzle) ## (Fail if we can't assign d to square s.)
+    return puzzle
 
 def grid_values(grid):
     "Convert grid into a dict of {square: char} with '0' or '.' for empties."
@@ -59,70 +59,70 @@ def grid_values(grid):
     assert len(chars) == 81
     return Puzzle(zip(squares, chars))
 
-def assign(values, square, digit):
-    """Eliminate all the other values (except digit) from values[square]
+def assign(puzzle, square, digit):
+    """Eliminate all the other values (except digit) from puzzle[square]
     and propagate.
-    Return values, except return failed if a contradiction is detected."""
-    other_values = values[square].replace(digit, '')
-    if all(eliminate(values, square, digit2) for digit2 in other_values):
-        return values
+    Return puzzle, except return failed if a contradiction is detected."""
+    other_values = puzzle[square].replace(digit, '')
+    if all(eliminate(puzzle, square, digit2) for digit2 in other_values):
+        return puzzle
     else:
-        return failed(values)
+        return failed(puzzle)
 
-def eliminate(values, square, digit):
-    """Eliminate digit from values[square];
+def eliminate(puzzle, square, digit):
+    """Eliminate digit from puzzle[square];
     propagate when values or places <= 2.
-    Return values, except return failed if a contradiction is detected."""
-    if digit not in values[square]:
-        return values ## Already eliminated
-    values[square] = values[square].replace(digit, '')
-    if len(values[square]) == 0:
-        return failed(values) ## Contradiction: removed last value
+    Return puzzle, except return failed if a contradiction is detected."""
+    if digit not in puzzle[square]:
+        return puzzle ## Already eliminated
+    puzzle[square] = puzzle[square].replace(digit, '')
+    if len(puzzle[square]) == 0:
+        return failed(puzzle) ## Contradiction: removed last value
 
-    values = peer_eliminate(values, square)
-    if has_failed(values):
-        return failed(values)
+    puzzle = peer_eliminate(puzzle, square)
+    if has_failed(puzzle):
+        return failed(puzzle)
 
-    values = assign_unique_place(values, square, digit)
-    if has_failed(values):
-        return failed(values)
+    puzzle = assign_unique_place(puzzle, square, digit)
+    if has_failed(puzzle):
+        return failed(puzzle)
 
-    return values
+    return puzzle
 
-def peer_eliminate(values, square):
+def peer_eliminate(puzzle, square):
     ## (1) If a square is reduced to one value, then eliminate it from the peers.
-    if len(values[square]) == 1:
-        digit = values[square]
-        if not all(eliminate(values, s2, digit) for s2 in peers[square]):
-            return failed(values)
-    return values
+    if len(puzzle[square]) == 1:
+        digit = puzzle[square]
+        if not all(eliminate(puzzle, s2, digit) for s2 in peers[square]):
+            return failed(puzzle)
+    return puzzle
 
-def assign_unique_place(values, square, digit):
+def assign_unique_place(puzzle, square, digit):
     ## (2) If a unit is reduced to only one place for a digit, then put it there
     for u in units[square]:
-        digit_places = [square2 for square2 in u if digit in values[square2]]
+        digit_places = [square2 for square2 in u if digit in puzzle[square2]]
         if len(digit_places) == 0:
-            return failed(values) ## Contradiction: no place for this value
+            return failed(puzzle) ## Contradiction: no place for this value
         elif len(digit_places) == 1:
             # digit can only be in one place in unit; assign it there
-            if not assign(values, digit_places[0], digit):
-                return failed(values)
-    return values
+            if not assign(puzzle, digit_places[0], digit):
+                return failed(puzzle)
+    return puzzle
 
 def solve(grid):
     return search(parse_grid(grid))
 
-def search(values):
+def search(puzzle):
     "Using depth-first search and propagation, try all possible values."
-    if has_failed(values):
-        return failed(values) ## Failed earlier
-    if all(len(values[s]) == 1 for s in squares):
-        return values ## Solved!
+    if has_failed(puzzle):
+        return failed(puzzle) ## Failed earlier
+    if all(len(puzzle[s]) == 1 for s in squares):
+        return puzzle ## Solved!
     ## Choose the unfilled square s with the fewest possibilities
-    possibilities, square = min((len(values[s]), s)
-                                for s in squares if len(values[s]) > 1)
-    return some(search(assign(values.copy(), square, digit))
-                for digit in values[square])
+    possibilities, square = min((len(puzzle[s]), s)
+                                for s in squares if len(puzzle[s]) > 1)
+    return some(search(assign(puzzle.copy(), square, digit))
+                for digit in puzzle[square])
 
 def some(seq):
     "Return some element of seq that is true."
@@ -136,14 +136,14 @@ def solve_all(grids, name='', showif=0.0):
     When showif is None, don't display any puzzles."""
     def time_solve(grid):
         start = time.clock()
-        values = solve(grid)
+        puzzle = solve(grid)
         t = time.clock()-start
         ## Display puzzles that take long enough
         if showif is not None and t > showif:
             display(grid_values(grid))
-            if values: display(values)
+            if puzzle: display(puzzle)
             print '(%.2f seconds)\n' % t
-        return (t, solved(values), values)
+        return (t, solved(puzzle), puzzle)
     times, results, valuedicts = zip(*[time_solve(grid) for grid in grids])
     N = len(grids)
     if N > 1:
@@ -152,23 +152,23 @@ def solve_all(grids, name='', showif=0.0):
             sum(results), N, name, sum(times), sum(times)/N, N/sum(times), max(times), min(times))
     return valuedicts
 
-def solved(values):
+def solved(puzzle):
     "A puzzle is solved if each unit is a permutation of the digits 1 to 9."
-    def unitsolved(unit): return set(values[s] for s in unit) == set(digits)
-    return (not has_failed(values)) and all(unitsolved(unit) for unit in unitlist)
+    def unitsolved(unit): return set(puzzle[s] for s in unit) == set(digits)
+    return (not has_failed(puzzle)) and all(unitsolved(unit) for unit in unitlist)
 
-def to_string(values):
-    return ''.join([value_or_dot(values[s]) for s in squares])
+def to_string(puzzle):
+    return ''.join([value_or_dot(puzzle[s]) for s in squares])
 
 def value_or_dot(value):
     return (value if (len(value) == 1) else '.')
 
-def display(values):
+def display(puzzle):
     "Display these values as a 2-D grid."
-    width = 1+max(len(values[s]) for s in squares)
+    width = 1+max(len(puzzle[s]) for s in squares)
     line = '+'.join(['-'*(width*3)]*3)
     for r in rows:
-        print ''.join(values[r+c].center(width)+('|' if c in '36' else '')
+        print ''.join(puzzle[r+c].center(width)+('|' if c in '36' else '')
                       for c in cols)
         if r in 'CF': print line
     print
