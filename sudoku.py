@@ -44,16 +44,16 @@ def failed(puzzle):
     return Puzzle([], puzzle.count)
 
 def parse_grid(grid):
-    """Convert grid to a dict of possible values, {square: digits}, or
+    """Convert grid to a puzzle of possible values, {square: digits}, or
     return a failed puzzle if a contradiction is detected."""
     ## To start, every square can be any digit; then assign values from the grid.
     puzzle = Puzzle((square, digits) for square in squares)
-    for square, digit in grid_values(grid).items():
+    for square, digit in grid_puzzle(grid).items():
         if digit in digits and not assign(puzzle, square, digit):
             return failed(puzzle) ## (Fail if we can't assign d to square s.)
     return puzzle
 
-def grid_values(grid):
+def grid_puzzle(grid):
     "Convert grid into a dict of {square: char} with '0' or '.' for empties."
     chars = [c for c in grid if c in digits or c in '0.']
     assert len(chars) == 81
@@ -140,7 +140,7 @@ def solve_all(grids, name='', showif=0.0):
         t = time.clock()-start
         ## Display puzzles that take long enough
         if showif is not None and t > showif:
-            display(grid_values(grid))
+            display(grid_puzzle(grid))
             if puzzle: display(puzzle)
             print '(%.2f seconds)\n' % t
         return (t, solved(puzzle), puzzle)
