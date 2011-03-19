@@ -164,7 +164,7 @@ def value_or_dot(value):
     return (value if (len(value) == 1) else '.')
 
 def display(puzzle):
-    "Display these values as a 2-D grid."
+    "Display this puzzle as a 2-D grid."
     width = 1+max(len(puzzle[s]) for s in squares)
     line = '+'.join(['-'*(width*3)]*3)
     for r in rows:
