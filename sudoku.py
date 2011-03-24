@@ -153,13 +153,14 @@ def solve_all(grids, name='', showif=0.0):
 
     N = len(grids)
     if N >= 1:
-        avg = sum(times)/N
         hz = N/sum(times)
         print "Solved %d of %d puzzles from %s in %.6f secs (%d Hz)" % (
             sum(results), N, name, sum(times), hz)
 
-        print "  (%d eliminations, avg %.6f secs, max %.6f secs, min %.6f secs)." % (
-            sum(eliminations), avg, max(times), min(times))
+        total_elims = sum(eliminations)
+        avg = total_elims/N
+        print "  (%d total eliminations, avg %.2f, max %d, min %d)." % (
+            total_elims, avg, max(eliminations), min(eliminations))
     return valuedicts
 
 def solved(puzzle):
