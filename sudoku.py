@@ -79,6 +79,7 @@ def eliminate(puzzle, square, digit):
     if len(puzzle[square]) == 0:
         return failed(puzzle) ## Contradiction: removed last value
 
+    puzzle.count += 1
     puzzle = peer_eliminate(puzzle, square)
     if has_failed(puzzle):
         return failed(puzzle)
@@ -121,14 +122,17 @@ def search(puzzle):
     ## Choose the unfilled square s with the fewest possibilities
     possibilities, square = min((len(puzzle[s]), s)
                                 for s in squares if len(puzzle[s]) > 1)
-    return some(search(assign(puzzle.copy(), square, digit))
-                for digit in puzzle[square])
+    return first_valid_result(puzzle, square, puzzle[square])
 
-def some(seq):
-    "Return some element of seq that is true."
-    for e in seq:
-        if e: return e
-    return failed(e)
+def first_valid_result(puzzle, square, values):
+    if len(values) == 0:
+        return failed(puzzle)
+    new_puzzle = search(assign(puzzle.copy(), square, values[0]))
+    if new_puzzle:
+        return new_puzzle
+    diff = new_puzzle.count - puzzle.count
+    puzzle.count += diff
+    return first_valid_result(puzzle, square, values[1:])
 
 def solve_all(grids, name='', showif=0.0):
     """Attempt to solve a sequence of grids. Report results.
