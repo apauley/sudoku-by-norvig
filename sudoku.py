@@ -135,19 +135,12 @@ def first_valid_result(puzzle, square, values):
     puzzle.count += diff
     return first_valid_result(puzzle, square, values[1:])
 
-def solve_all(grids, name='', showif=0.0):
-    """Attempt to solve a sequence of grids. Report results.
-    When showif is a number of seconds, display puzzles that take longer.
-    When showif is None, don't display any puzzles."""
+def solve_all(grids, name=''):
+    """Attempt to solve a sequence of grids. Report results."""
     def time_solve(grid):
         start = time.clock()
         puzzle = solve(grid)
         t = time.clock()-start
-        ## Display puzzles that take long enough
-        if showif is not None and t > showif:
-            display(grid_puzzle(grid))
-            if puzzle: display(puzzle)
-            print '(%.2f seconds)\n' % t
         return (t, is_solved(puzzle), puzzle)
     times, results, puzzles = zip(*[time_solve(grid) for grid in grids])
     eliminations = [puzzle.count for puzzle in puzzles]
@@ -175,16 +168,6 @@ def to_string(puzzle):
 def value_or_dot(value):
     return (value if (len(value) == 1) else '.')
 
-def display(puzzle):
-    "Display this puzzle as a 2-D grid."
-    width = 1+max(len(puzzle[s]) for s in squares)
-    line = '+'.join(['-'*(width*3)]*3)
-    for r in rows:
-        print ''.join(puzzle[r+c].center(width)+('|' if c in '36' else '')
-                      for c in cols)
-        if r in 'CF': print line
-    print
-
 def from_file(filename, sep='\n'):
     "Parse a file into a list of strings, separated by sep."
     return file(filename).read().strip().split(sep)
@@ -198,7 +181,7 @@ def to_file(outfile, solutions):
         fp.close()
 
 def solve_file(filename, sep='\n'):
-    solutions = solve_all(from_file(filename, sep), filename, None)
+    solutions = solve_all(from_file(filename, sep), filename)
     outfile = os.path.splitext(filename)[0] + '.out'
     to_file(outfile, solutions)
 
