@@ -148,7 +148,7 @@ def solve_all(grids, name='', showif=0.0):
             display(grid_puzzle(grid))
             if puzzle: display(puzzle)
             print '(%.2f seconds)\n' % t
-        return (t, solved(puzzle), puzzle)
+        return (t, is_solved(puzzle), puzzle)
     times, results, puzzles = zip(*[time_solve(grid) for grid in grids])
     eliminations = [puzzle.count for puzzle in puzzles]
 
@@ -164,7 +164,7 @@ def solve_all(grids, name='', showif=0.0):
             total_elims, avg, max(eliminations), min(eliminations))
     return puzzles
 
-def solved(puzzle):
+def is_solved(puzzle):
     "A puzzle is solved if each unit is a permutation of the digits 1 to 9."
     def unitsolved(unit): return set(puzzle[s] for s in unit) == set(digits)
     return (not has_failed(puzzle)) and all(unitsolved(unit) for unit in unitlist)
