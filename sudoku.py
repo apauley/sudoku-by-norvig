@@ -29,6 +29,7 @@ peers = dict((s, set(s2 for u in units[s] for s2 in u if s2 != s))
              for s in squares)
 
 class Puzzle(dict):
+    "A dict with a counter"
     def __init__(self, tuples, count=0):
         self.count = count
         super(Puzzle, self).__init__(tuples)
