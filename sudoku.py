@@ -118,8 +118,8 @@ def search(puzzle):
     "Using depth-first search and propagation, try all possible values."
     if has_failed(puzzle):
         return failed(puzzle) ## Failed earlier
-    if all(len(puzzle[s]) == 1 for s in squares):
-        return puzzle ## Solved!
+    if is_solved(puzzle):
+        return puzzle
     ## Choose the unfilled square s with the fewest possibilities
     possibilities, square = min((len(puzzle[s]), s)
                                 for s in squares if len(puzzle[s]) > 1)
