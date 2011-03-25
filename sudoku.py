@@ -151,15 +151,18 @@ def solve_all(grids, name=''):
         print "Solved %d of %d puzzles from %s in %.6f secs (%d Hz)" % (
             sum(results), N, name, sum(times), hz)
 
-        [total_elims, avg_elims, max_elims, min_elims] = stats(eliminations)
-        print "  (%d total eliminations, avg %.2f, max %d, min %d)." % (
-            total_elims, avg_elims, max_elims, min_elims)
+        [total, avg, median, max_elims, min_elims] = stats(eliminations)
+        print "  (%d total eliminations, avg %.2f, median %d, max %d, min %d)." % (
+            total, avg, median, max_elims, min_elims)
     return puzzles
 
 def stats(lst):
     total = sum(lst)
-    avg = total/len(lst)
-    return [total, avg, max(lst), min(lst)]
+    length = len(lst)
+    avg = total/length
+    med_index = int(round(length/2))
+    med = sorted(lst)[med_index]
+    return [total, avg, med, max(lst), min(lst)]
 
 def is_solved(puzzle):
     "A puzzle is solved if each unit is a permutation of the digits 1 to 9."
@@ -204,10 +207,11 @@ def test():
     assert peers['C2'] == set(['A2', 'B2', 'D2', 'E2', 'F2', 'G2', 'H2', 'I2',
                                'C1', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9',
                                'A1', 'A3', 'B1', 'B3'])
-    [total, avg, max, min] = stats([5, 8, 2])
+    [total, avg, med, max, min] = stats([6, 7, 2])
     assert total == 15
     assert avg == 5
-    assert max == 8
+    assert med == 6
+    assert max == 7
     assert min == 2
 
     print 'All tests pass.'
