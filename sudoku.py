@@ -151,11 +151,15 @@ def solve_all(grids, name=''):
         print "Solved %d of %d puzzles from %s in %.6f secs (%d Hz)" % (
             sum(results), N, name, sum(times), hz)
 
-        total_elims = sum(eliminations)
-        avg = total_elims/N
+        [total_elims, avg_elims, max_elims, min_elims] = stats(eliminations)
         print "  (%d total eliminations, avg %.2f, max %d, min %d)." % (
-            total_elims, avg, max(eliminations), min(eliminations))
+            total_elims, avg_elims, max_elims, min_elims)
     return puzzles
+
+def stats(lst):
+    total = sum(lst)
+    avg = total/len(lst)
+    return [total, avg, max(lst), min(lst)]
 
 def is_solved(puzzle):
     "A puzzle is solved if each unit is a permutation of the digits 1 to 9."
