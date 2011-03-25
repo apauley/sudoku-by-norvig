@@ -204,6 +204,12 @@ def test():
     assert peers['C2'] == set(['A2', 'B2', 'D2', 'E2', 'F2', 'G2', 'H2', 'I2',
                                'C1', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9',
                                'A1', 'A3', 'B1', 'B3'])
+    [total, avg, max, min] = stats([5, 8, 2])
+    assert total == 15
+    assert avg == 5
+    assert max == 8
+    assert min == 2
+
     print 'All tests pass.'
 
 if __name__ == '__main__':
