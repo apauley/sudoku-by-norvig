@@ -202,6 +202,9 @@ def solve_file(filename, sep='\n'):
     outfile = os.path.splitext(filename)[0] + '.out'
     to_file(outfile, solutions)
 
+def solve_files(*filenames):
+    [solve_file(filename) for filename in filenames]
+
 def test():
     "A set of tests that must pass."
     assert len(squares) == 81
@@ -215,9 +218,6 @@ def test():
                                'C1', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9',
                                'A1', 'A3', 'B1', 'B3'])
     print 'All tests pass.'
-
-def solve_files(*filenames):
-    [solve_file(filename) for filename in filenames]
 
 if __name__ == '__main__':
     test()
