@@ -148,7 +148,7 @@ def solve_all(grids, name=''):
     N = len(grids)
     if N >= 1:
         hz = N/sum(times)
-        print "Solved %d of %d puzzles from %s in %.6f secs (%d Hz)" % (
+        print "Solved %d of %d puzzles from %s in %.6f secs (%.2f Hz)" % (
             sum(results), N, name, sum(times), hz)
 
         [total, avg, median, max_elims, min_elims] = stats(eliminations)
